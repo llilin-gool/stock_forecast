@@ -34,12 +34,13 @@
                 <ul class="nav navbar-nav">
                     <li><a href="/"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> 历史交易行情</a>
                     </li>
-                    <li class="active"><a href="/wordcloud"><span class="glyphicon glyphicon-cloud"
-                                                                  aria-hidden="true"></span> 股票舆情云图</a></li>
                     <li><a href="/dicopinion"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
                         情感字典舆情统计</a></li>
                     <li><a href="/nbopinion"><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
                         机器学习舆情预测</a></li>
+                    <li class="active"><a href="/wordcloud"><span class="glyphicon glyphicon-cloud"
+                                                                  aria-hidden="true"></span> 股票舆情云图</a></li>
+
                 </ul>
             </div>
         </div>
@@ -50,22 +51,22 @@
     <h3 class="text-primary text-center">个股词云图</h3>
 </div>
 
-<div class="container">
-    <div class="panel panel-primary">
-        <div class="panel-heading">个股词云查询</div>
-        <div class="panel-body">
-            <p class="lead">输入完整的股票代码，支持字母和数字同时输入</p>
-            <form class="form-inline" action="/wordcloudResult/" role="form" method="get">
-                <div class="form-group">
-                    <label class="sr-only" for="Inputstock"></label>
-                    <input type="text" class="form-control" name="stocknum" id="gettext3" placeholder="输入股票代码"/>
-                </div>
-                <button type="submit" class="btn btn-primary">查询 <span class="glyphicon glyphicon-search"
-                                                                       aria-hidden="true"></span></button>
-            </form>
-        </div>
-    </div>
-</div>
+{#<div class="container">#}
+{#    <div class="panel panel-primary">#}
+{#        <div class="panel-heading">个股词云查询</div>#}
+{#        <div class="panel-body">#}
+{#            <p class="lead">输入完整的股票代码，支持字母和数字同时输入</p>#}
+{#            <form class="form-inline" action="/wordcloudResult/" role="form" method="get">#}
+{#                <div class="form-group">#}
+{#                    <label class="sr-only" for="Inputstock"></label>#}
+{#                    <input type="text" class="form-control" name="stocknum" id="gettext3" placeholder="输入股票代码"/>#}
+{#                </div>#}
+{#                <button type="submit" class="btn btn-primary">查询 <span class="glyphicon glyphicon-search"#}
+{#                                                                       aria-hidden="true"></span></button>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
 
 <div class="container">
     <div class="panel panel-info">
@@ -88,14 +89,15 @@
 <script type="text/javascript">
 
     var myChart = echarts.init(document.getElementById('main'));
-    console.log(myChart)
     // 基于准备好的dom，初始化echarts实例
+    var wordcloudt =
+    {{wordcloud|safe}}
+
+    var wordcloud = wordcloudt.reverse()
     var option = {
         title: {
-            text: "小米",
-            link: 'https://github.com/ecomfe/echarts-wordcloud',
+            text: "热点股票",
             subtext: '近期热点词汇',
-            sublink: 'http://data-visual.cn',
         },
         tooltip: {},
         series: [{
@@ -119,42 +121,7 @@
                     shadowColor: '#333'
                 }
             },
-            data: [{
-                name: '小米',
-                value: 10000,
-                textStyle: {
-                    normal: {
-                        color: 'black'
-                    },
-                    emphasis: {
-                        color: 'red'
-                    }
-                }
-            }, {
-                name: '富士康',
-                value: 6181
-            }, {
-                name: 'CDR',
-                value: 4386
-            }, {
-                name: '赴港',
-                value: 4055
-            }, {
-                name: '上市',
-                value: 2467
-            }, {
-                name: '过会',
-                value: 2244
-            }, {
-                name: '康德',
-                value: 1898
-            }, {
-                name: 'IPO',
-                value: 1484
-            }, {
-                name: '爱奇艺',
-                value: 1112
-            }]
+            data: wordcloud
         }]
     };
     myChart.setOption(option);

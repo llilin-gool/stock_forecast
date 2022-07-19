@@ -207,11 +207,33 @@ def stockKLine(request):
 
 
 def wordcloud(request):
-    return render(request, "wordcloud.html")
+    stock_his_data = ts.get_today_all()
+    arr = []
+    for i in range(len(stock_his_data)):
+        arr.append({
+            "name": stock_his_data["name"][i],
+            "value": stock_his_data["mktcap"][i]
+        })
+
+    arr.sort(key=lambda x: x["value"], reverse=True)
+
+    return render(request, "wordcloud.html", {'wordcloud': json.dumps(arr)})
 
 
 def wordcloudResult(request):
-    return render(request, "wordcloudResult.html")
+    stocknum = request.GET['stocknum']
+    stock_his_data = ts.get_today_all()
+    stock_name = get_stock_name(stocknum)
+    arr = []
+    for i in range(len(stock_his_data)):
+        arr.append({
+            "name": stock_his_data["name"][i],
+            "value": stock_his_data["mktcap"][i]
+        })
+
+    arr.sort(key=lambda x: x["value"], reverse=True)
+
+    return render(request, "wordcloudResult.html", {wordcloudResult: json.dumps(arr)})
 
 
 def dicopinion(request):
@@ -369,7 +391,6 @@ def setDate():
 
 # 获取股票名称
 def get_stock_name(stocknumber):
-
     realtimeData = ts.get_realtime_quotes(stocknumber)
     realtimeData = realtimeData.to_dict('record')
     stock_name = realtimeData[0]['name']
@@ -414,7 +435,6 @@ def NB_create_model():
 
         # itemstemp = re.findall(pattern, content)
         for index, item in enumerate(nodes):
-
             view = item.xpath('./span[@class="l1 a1"]/text()').extract_first()
             comment_count = item.xpath('./span[@class="l2 a2"]/text()').extract_first()
             title = item.xpath('./span[@class="l3 a3"]/a/text()').extract_first()
@@ -466,5 +486,6 @@ def NB_create_model():
     joblib.dump(vectorizer, 'Vect_v1')
     joblib.dump(transformer, 'Tf-Idf_v1')
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     NB_create_model()

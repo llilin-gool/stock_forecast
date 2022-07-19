@@ -66,6 +66,9 @@
 <script type="text/javascript">
     var myChart = echarts.init(document.getElementById('main'));
     // 基于准备好的dom，初始化echarts实例
+    var wordcloudt = {{wordcloud|safe}}
+
+    var wordcloud = wordcloudt.reverse()
     var option = {
         title: {
             text: "小米",
@@ -95,42 +98,7 @@
                     shadowColor: '#333'
                 }
             },
-            data: [{
-                name: '小米',
-                value: 10000,
-                textStyle: {
-                    normal: {
-                        color: 'black'
-                    },
-                    emphasis: {
-                        color: 'red'
-                    }
-                }
-            }, {
-                name: '富士康',
-                value: 6181
-            }, {
-                name: 'CDR',
-                value: 4386
-            }, {
-                name: '赴港',
-                value: 4055
-            }, {
-                name: '上市',
-                value: 2467
-            }, {
-                name: '过会',
-                value: 2244
-            }, {
-                name: '康德',
-                value: 1898
-            }, {
-                name: 'IPO',
-                value: 1484
-            }, {
-                name: '爱奇艺',
-                value: 1112
-            }]
+            data: wordcloud
         }]
     };
     myChart.setOption(option);
