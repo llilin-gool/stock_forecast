@@ -9,6 +9,11 @@
    <script src="../static/js/StockVisual/echarts.js"></script>
    <script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
    <script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+        body {
+            background: url("/static/newBg.jpg");
+        }
+    </style>
 </head>
 
 <body>
@@ -39,10 +44,10 @@
     </div>
 
     <div class="container"> 
-      <h3 class="text-primary text-center">{{stock_name}}</h3>
+      <h3 class="text-primary text-center" style="color: white">{{stock_name}}</h3>
     </div>
 
-    <div class="container">
+    <div class="container" style="opacity: 0.9!important;">
     <div class="panel panel-info">
       <div class="panel-heading">基于情感字典舆情统计</div>
       <div class="panel-body">
