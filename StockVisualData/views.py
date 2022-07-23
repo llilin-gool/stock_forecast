@@ -150,7 +150,7 @@ def stockKLine(request):
     homedir = os.getcwd()
     print(homedir)
     print("++++++++++++++++++++++++++++++")
-    clf = joblib.load(homedir + '/StockVisualData/Clf.pkl')
+    clf = joblib.load(homedir + '/StockVisualData/clf.pkl')
     vectorizer = joblib.load(homedir + '/StockVisualData/Vect')
     transformer = joblib.load(homedir + '/StockVisualData/Tfidf')
     print(clf)
@@ -198,7 +198,7 @@ def stockKLine(request):
                     elif predicted == '中立':
                         nb_dateCount[j][4] += 1
 
-    return render(request, 'Stockkline/stockKline.html',
+    return render(request, 'Stockkline/stockKLine.html',
                   {'stock_name': json.dumps(stock_name), 'date': json.dumps(date), 'open': json.dumps(open),
                    'close': json.dumps(close), 'high': json.dumps(high), 'low': json.dumps(low),
                    'volume': json.dumps(volume), 'dataMA5': json.dumps(dataMA5), 'dataMA10': json.dumps(dataMA10),
@@ -316,7 +316,7 @@ def nbopinionResult(request):
     stock_name = get_stock_name(Nb_stock_number)
     homedir = os.getcwd()
 
-    clf = joblib.load(homedir + '/StockVisualData/Clf.pkl')
+    clf = joblib.load(homedir + '/StockVisualData/clf.pkl')
     vectorizer = joblib.load(homedir + '/StockVisualData/Vect')
     transformer = joblib.load(homedir + '/StockVisualData/Tfidf')
 
@@ -392,9 +392,19 @@ def setDate():
 # 获取股票名称
 def get_stock_name(stocknumber):
     realtimeData = ts.get_realtime_quotes(stocknumber)
-    realtimeData = realtimeData.to_dict('record')
-    stock_name = realtimeData[0]['name']
-    return stock_name
+    templateType = [{
+        "name": "测试"
+    }]
+    if not type(realtimeData)==type(templateType):
+        realtimeData = realtimeData.to_dict('record')
+    # print(realtimeData)
+    if realtimeData[0]['name'] == 'FAILED':
+        return "不存在该股票"
+    else:
+        stock_name = realtimeData[0]['name']
+        return stock_name
+
+
 
 
 # 获取分词List

@@ -29,7 +29,7 @@ urlpatterns = [
        path('pyecharts/',opinion_views.index),
        url(r'^$', StockVisualData_views.home, name='home'),
        url(r'^index/$', StockVisualData_views.index, name='index'),
-       url(r'^stockKLine/$', StockVisualData_views.stockKLine, name='stockKline'),
+       url(r'^stockKLine/$', StockVisualData_views.stockKLine, name='stockKLine'),
        
        url(r'^wordcloud/$', StockVisualData_views.wordcloud, name='wordcloud'),
        url(r'^wordcloudResult/$', StockVisualData_views.wordcloudResult, name='wordcloudResult'),
