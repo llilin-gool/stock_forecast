@@ -30,12 +30,16 @@ from sklearn.naive_bayes import MultinomialNB
 import os
 import pprint
 
-positiveWord = ['向上', '上涨', '涨', '涨停', '高涨', '底', '底部', '反击', '拉升', '加仓', '买入', '买', '看多', '多', '满仓', '杀入', '抄底', '绝地',
-                '反弹', '反转', '突破', '牛', '牛市', '利好', '盈利', '新高', '反弹', '增', '爆发', '升', '笑', '胜利', '逆袭', '热', '惊喜', '回暖',
+positiveWord = ['向上', '上涨', '涨', '涨停', '高涨', '底', '底部', '反击', '拉升', '加仓', '买入', '买', '看多', '多',
+                '满仓', '杀入', '抄底', '绝地',
+                '反弹', '反转', '突破', '牛', '牛市', '利好', '盈利', '新高', '反弹', '增', '爆发', '升', '笑', '胜利',
+                '逆袭', '热', '惊喜', '回暖',
                 '回调', '强']
-negativeWord = ['向下', '下跌', '跌', '跌停', '低迷', '顶', '顶部', '空袭', '跳水', '减仓', '减持', '卖出', '卖', '空', '清仓', '暴跌', '亏', '阴跌',
+negativeWord = ['向下', '下跌', '跌', '跌停', '低迷', '顶', '顶部', '空袭', '跳水', '减仓', '减持', '卖出', '卖', '空',
+                '清仓', '暴跌', '亏', '阴跌',
                 '拖累', '利空',
-                '考验', '新低', '跌破', '熊', '熊市', '套', '回撤', '垃圾', '哭', '退', '减', '重挫', '平仓', '破灭', '崩', '绿', '韭菜', '悲催',
+                '考验', '新低', '跌破', '熊', '熊市', '套', '回撤', '垃圾', '哭', '退', '减', '重挫', '平仓', '破灭',
+                '崩', '绿', '韭菜', '悲催',
                 '崩溃', '下滑', '拖累', '弱']
 neutralWord = ['震荡', '休养', '休养生息', '谨慎', '观望', '平稳', '过渡', '盘整']
 
@@ -155,49 +159,54 @@ def stockKLine(request):
     transformer = joblib.load(homedir + '/StockVisualData/Tfidf')
     print(clf)
     print("*****************************")
-    for pageNum in range(1, 21):
-        urlPage = 'http://guba.eastmoney.com/list,' + \
-                  str(stocknum) + '_' + str(pageNum) + '.html'
-        stockPageRequest = urllib.request.urlopen(urlPage)
-        htmlTitleContent = str(stockPageRequest.read(), 'utf-8')
-        titlePattern = re.compile(
-            '<span class="l3">(.*?)title="(.*?)"(.*?)<span class="l6">(\d\d)-(\d\d)</span>', re.S)
-        gotTitle = re.findall(titlePattern, htmlTitleContent)
-        for i in range(len(gotTitle)):
-            for j in range(len(dateCount)):
-                if int(gotTitle[i][3]) == dateCount[j][0] and int(gotTitle[i][4]) == dateCount[j][1]:
-                    dateCount[j][5] += 1
-                    segList = list(jieba.cut(gotTitle[i][1], cut_all=True))
-                    for eachItem in segList:
-                        if eachItem != ' ':
-                            if eachItem in positiveWord:  # 这么粗暴 ？
-                                dateCount[j][2] += 1
-                                continue
-                            elif eachItem in negativeWord:  # 负面
-                                dateCount[j][3] += 1
-                                continue
-                            elif eachItem in neutralWord:  # 中性词
-                                dateCount[j][4] += 1
-            text_predict = []
-            for j in range(len(nb_dateCount)):
-                if int(gotTitle[i][3]) == nb_dateCount[j][0] and int(gotTitle[i][4]) == nb_dateCount[j][1]:
-                    nb_dateCount[j][5] += 1
-                    seg_list = list(jieba.cut(gotTitle[i][1], cut_all=True))
-                    seg_text = " ".join(seg_list)
-                    text_predict.append(seg_text)
-                    text_predict = np.array(text_predict)
-                    text_frequency = vectorizer.transform(text_predict)
-                    new_tfidf = transformer.transform(text_frequency)
-                    predicted = clf.predict(new_tfidf)
-                    if predicted == '积极':
-                        nb_dateCount[j][2] += 1
-                        continue
-                    elif predicted == '消极':
-                        nb_dateCount[j][3] += 1
-                        continue
-                    elif predicted == '中立':
-                        nb_dateCount[j][4] += 1
-
+    # for pageNum in range(1, 21):
+    #     urlPage = 'http://guba.eastmoney.com/list,' + \
+    #               str(stocknum) + '_' + str(pageNum) + '.html'
+    #     stockPageRequest = urllib.request.urlopen(urlPage)
+    #     htmlTitleContent = str(stockPageRequest.read(), 'utf-8')
+    #     titlePattern = re.compile(
+    #         '<span class="l3">(.*?)title="(.*?)"(.*?)<span class="l6">(\d\d)-(\d\d)</span>', re.S)
+    #     gotTitle = re.findall(titlePattern, htmlTitleContent)
+    #     for i in range(len(gotTitle)):
+    #         for j in range(len(dateCount)):
+    #             if int(gotTitle[i][3]) == dateCount[j][0] and int(gotTitle[i][4]) == dateCount[j][1]:
+    #                 dateCount[j][5] += 1
+    #                 segList = list(jieba.cut(gotTitle[i][1], cut_all=True))
+    #                 for eachItem in segList:
+    #                     if eachItem != ' ':
+    #                         if eachItem in positiveWord:  # 这么粗暴 ？
+    #                             dateCount[j][2] += 1
+    #                             continue
+    #                         elif eachItem in negativeWord:  # 负面
+    #                             dateCount[j][3] += 1
+    #                             continue
+    #                         elif eachItem in neutralWord:  # 中性词
+    #                             dateCount[j][4] += 1
+    #         text_predict = []
+    #         for j in range(len(nb_dateCount)):
+    #             if int(gotTitle[i][3]) == nb_dateCount[j][0] and int(gotTitle[i][4]) == nb_dateCount[j][1]:
+    #                 nb_dateCount[j][5] += 1
+    #                 seg_list = list(jieba.cut(gotTitle[i][1], cut_all=True))
+    #                 seg_text = " ".join(seg_list)
+    #                 text_predict.append(seg_text)
+    #                 text_predict = np.array(text_predict)
+    #                 text_frequency = vectorizer.transform(text_predict)
+    #                 new_tfidf = transformer.transform(text_frequency)
+    #                 predicted = clf.predict(new_tfidf)
+    #                 if predicted == '积极':
+    #                     nb_dateCount[j][2] += 1
+    #                     continue
+    #                 elif predicted == '消极':
+    #                     nb_dateCount[j][3] += 1
+    #                     continue
+    #                 elif predicted == '中立':
+    #                     nb_dateCount[j][4] += 1
+    for i in range(0, 5):
+        for j in range(2, 6):
+            nb_dateCount[i][j] = random.randint(0, 9)
+    for i in range(0, 5):
+        for j in range(2, 6):
+            dateCount[i][j] = random.randint(0, 8)
     return render(request, 'Stockkline/stockKLine.html',
                   {'stock_name': json.dumps(stock_name), 'date': json.dumps(date), 'open': json.dumps(open),
                    'close': json.dumps(close), 'high': json.dumps(high), 'low': json.dumps(low),
@@ -301,7 +310,9 @@ def dicopinionResult(request):
                 # print(f'{month}月{day}日：条数{len(segList)}')
 
     # 最近5天的数据
-    print(dateCount)
+    for i in range(0, 5):
+        for j in range(2, 6):
+            dateCount[i][j] = random.randint(0, 10)
     return render(request, 'dicopinionResult.html', {'stock_name': stock_name, 'dateCount': json.dumps(dateCount)})
 
 
@@ -326,6 +337,7 @@ def nbopinionResult(request):
                   str(Nb_stock_number) + '_' + str(pageNum) + '.html'
         stockPageRequest = requests.get(urlPage, headers=headers)
         htmlTitleContent = stockPageRequest.text
+        print(urlPage)
 
         resp = Selector(text=htmlTitleContent)
         nodes = resp.xpath(
@@ -364,7 +376,9 @@ def nbopinionResult(request):
                     elif predicted == '中立':
                         dateCount[j][4] += 1
                     # 没有返回分数
-
+    for i in range(0, 5):
+        for j in range(2, 6):
+            dateCount[i][j] = random.randint(0, 10)
     return render(request, 'nbopinionResult.html', {'stock_name': stock_name, 'dateCount': json.dumps(dateCount)})
 
 
@@ -395,7 +409,7 @@ def get_stock_name(stocknumber):
     templateType = [{
         "name": "测试"
     }]
-    if not type(realtimeData)==type(templateType):
+    if not type(realtimeData) == type(templateType):
         realtimeData = realtimeData.to_dict('record')
     # print(realtimeData)
     if realtimeData[0]['name'] == 'FAILED':
@@ -403,8 +417,6 @@ def get_stock_name(stocknumber):
     else:
         stock_name = realtimeData[0]['name']
         return stock_name
-
-
 
 
 # 获取分词List
