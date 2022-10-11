@@ -13,10 +13,24 @@
         body {
             background: url("/static/newBg.jpg");
         }
+        .load_container{
+            width: 300px;
+            height: 30px;
+            border: 1px solid lightgray;
+            border-radius: 15px;
+        }
+         /* 内部加载部分样式 */
+        #load_content{
+            height: 30px;
+            border-radius: 15px;
+            background-color: skyblue;
+            text-align: center;
+            line-height: 30px;
+        }
     </style>
 </head>
 
-<body>
+<body id="body">
 <div class="container">
     <nav class="navbar navbar-default">
         <div class="container">
@@ -41,14 +55,16 @@
                                                                    aria-hidden="true"></span> 情感字典舆情统计</a></li>
                     <li><a href="/nbopinion"><span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
                         机器学习舆情预测</a></li>
-                    <li><a href="/wordcloud"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+                    <li onclick="load()"><a href="/wordcloud"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
                         股票舆情云图</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 </div>
-
+<div class="load_container">
+        <div id="load_content"></div>
+</div>
 <div class="container">
     <h3 class="text-primary text-center"  style="color: white">情感倾向统计</h3>
 </div>
@@ -82,6 +98,35 @@
     </div>
 </div>
 <script type="text/javascript">
+    function load(){
+        let href = window.location.href
+        var _content=document.getElementById("load_content");
+        var num=0; //进度条里边的长度
+
+        //设置计时器（动起来的关键）
+        var id = setInterval(function(){
+           num++;
+           if (href==window.location.href){
+               num = 297
+               console.log(num)
+           }
+           //设置content的宽度（动态变化）
+           _content.style.width=`${num}px`;
+           var num1=parseInt(num/3);
+           //content内文字显示为百分比与宽度对应
+           _content.innerText=`${num1}%`;
+           //当content的宽度与container宽度相同时清除计时器
+
+           if(num==300){
+            clearInterval(id);
+           }
+           //加载到100%时替换content中的文字
+        if(_content.innerText=="100%"){
+            _content.innerText="加载完成"
+        }
+        //每隔10毫秒变换一次
+        },10)
+    }
     var myChart = echarts.init(document.getElementById('main'));
     // 基于准备好的dom，初始化echarts实例
     var posList = [
@@ -148,7 +193,7 @@
             {
                 name: '发帖总数',
                 type: 'bar',
-                data: [387, 399, 368, 354, 308]
+                data: [204, 295, 368, 156, 308]
             }
         ]
     };
