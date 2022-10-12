@@ -2323,48 +2323,48 @@ def dicopinionResult(request):
     stock_name = get_stock_name(dicStockNum)
 
     # 爬取10页 后续改为异步爬取
-    for pageNum in range(1, 10):
-        print(f'page:{pageNum}')
-        urlPage = 'http://guba.eastmoney.com/list,' + \
-                  str(dicStockNum) + ',f_' + str(pageNum) + '.html'
-        stockPageRequest = requests.get(urlPage, headers=headers)
-        htmlTitleContent = stockPageRequest.text
-
-        resp = Selector(text=htmlTitleContent)
-        nodes = resp.xpath(
-            '//div[contains(@class,"articleh normal_post") or contains(@class,"articleh normal_post odd")]')
-
-        for index, item in enumerate(nodes):
-            view = item.xpath('./span[@class="l1 a1"]/text()').extract_first()
-            comment_count = item.xpath('./span[@class="l2 a2"]/text()').extract_first()
-            title = item.xpath('./span[@class="l3 a3"]/a/text()').extract_first()
-            author = item.xpath('./span[@class="l4 a4"]/a/text()').extract_first()
-            create_time = item.xpath('./span[@class="l5 a5"]/text()').extract_first()
-            # 处理日期
-            date_pattern = re.search('(\d+)-(\d+)', create_time)
-
-            month = sub_zero(date_pattern.group(1))
-
-            day = sub_zero(date_pattern.group(2))
-
-            for j in range(len(dateCount)):  # 5天
-
-                if int(month) == dateCount[j][0] and int(day) == dateCount[j][1]:
-                    dateCount[j][5] += 1  # 数组的最后一个数+1，计算出现了一次，今天的标题
-                    segList = list(jieba.cut(title, cut_all=True))  # 分词后保存
-                    # print(tx_npl(gotTitle[i][1]))
-                    for eachItem in segList:
-                        if eachItem != ' ':
-                            if eachItem in positiveWord:  # 粗暴 简单
-                                dateCount[j][2] += 1
-                                continue
-                            elif eachItem in negativeWord:
-                                dateCount[j][3] += 1
-                                continue
-                            elif eachItem in neutralWord:
-                                dateCount[j][4] += 1
-
-                # print(f'{month}月{day}日：条数{len(segList)}')
+    # for pageNum in range(1, 10):
+    #     print(f'page:{pageNum}')
+    #     urlPage = 'http://guba.eastmoney.com/list,' + \
+    #               str(dicStockNum) + ',f_' + str(pageNum) + '.html'
+    #     stockPageRequest = requests.get(urlPage, headers=headers)
+    #     htmlTitleContent = stockPageRequest.text
+    #
+    #     resp = Selector(text=htmlTitleContent)
+    #     nodes = resp.xpath(
+    #         '//div[contains(@class,"articleh normal_post") or contains(@class,"articleh normal_post odd")]')
+    #
+    #     for index, item in enumerate(nodes):
+    #         view = item.xpath('./span[@class="l1 a1"]/text()').extract_first()
+    #         comment_count = item.xpath('./span[@class="l2 a2"]/text()').extract_first()
+    #         title = item.xpath('./span[@class="l3 a3"]/a/text()').extract_first()
+    #         author = item.xpath('./span[@class="l4 a4"]/a/text()').extract_first()
+    #         create_time = item.xpath('./span[@class="l5 a5"]/text()').extract_first()
+    #         # 处理日期
+    #         date_pattern = re.search('(\d+)-(\d+)', create_time)
+    #
+    #         month = sub_zero(date_pattern.group(1))
+    #
+    #         day = sub_zero(date_pattern.group(2))
+    #
+    #         for j in range(len(dateCount)):  # 5天
+    #
+    #             if int(month) == dateCount[j][0] and int(day) == dateCount[j][1]:
+    #                 dateCount[j][5] += 1  # 数组的最后一个数+1，计算出现了一次，今天的标题
+    #                 segList = list(jieba.cut(title, cut_all=True))  # 分词后保存
+    #                 # print(tx_npl(gotTitle[i][1]))
+    #                 for eachItem in segList:
+    #                     if eachItem != ' ':
+    #                         if eachItem in positiveWord:  # 粗暴 简单
+    #                             dateCount[j][2] += 1
+    #                             continue
+    #                         elif eachItem in negativeWord:
+    #                             dateCount[j][3] += 1
+    #                             continue
+    #                         elif eachItem in neutralWord:
+    #                             dateCount[j][4] += 1
+    #
+    #             # print(f'{month}月{day}日：条数{len(segList)}')
 
     # 最近5天的数据
     for i in range(0, 5):
@@ -2388,52 +2388,53 @@ def nbopinionResult(request):
     vectorizer = joblib.load(homedir + '/StockVisualData/Vect')
     transformer = joblib.load(homedir + '/StockVisualData/Tfidf')
 
-    for pageNum in range(1, 10):
-
-        urlPage = 'http://guba.eastmoney.com/list,' + \
-                  str(Nb_stock_number) + '_' + str(pageNum) + '.html'
-        stockPageRequest = requests.get(urlPage, headers=headers)
-        htmlTitleContent = stockPageRequest.text
-        print(urlPage)
-
-        resp = Selector(text=htmlTitleContent)
-        nodes = resp.xpath(
-            '//div[contains(@class,"articleh normal_post") or contains(@class,"articleh normal_post odd")]')
-
-        for index, item in enumerate(nodes):
-            view = item.xpath('./span[@class="l1 a1"]/text()').extract_first()
-            comment_count = item.xpath('./span[@class="l2 a2"]/text()').extract_first()
-            title = item.xpath('./span[@class="l3 a3"]/a/text()').extract_first()
-            author = item.xpath('./span[@class="l4 a4"]/a/text()').extract_first()
-            create_time = item.xpath('./span[@class="l5 a5"]/text()').extract_first()
-            # 处理日期
-            date_pattern = re.search('(\d+)-(\d+)', create_time)
-
-            month = sub_zero(date_pattern.group(1))
-
-            day = sub_zero(date_pattern.group(2))
-
-            text_predict = []
-            for j in range(len(dateCount)):
-                if int(month) == dateCount[j][0] and int(day) == dateCount[j][1]:
-                    dateCount[j][5] += 1
-                    seg_list = list(jieba.cut(title, cut_all=True))
-                    seg_text = " ".join(seg_list)
-                    text_predict.append(seg_text)
-                    text_predict = np.array(text_predict)
-                    text_frequency = vectorizer.transform(text_predict)
-                    new_tfidf = transformer.transform(text_frequency)
-                    predicted = clf.predict(new_tfidf)
-                    if predicted == '积极':
-                        dateCount[j][2] += 1
-                        continue
-                    elif predicted == '消极':
-                        dateCount[j][3] += 1
-                        continue
-                    elif predicted == '中立':
-                        dateCount[j][4] += 1
+    # for pageNum in range(1, 10):
+    #
+    #     urlPage = 'http://guba.eastmoney.com/list,' + \
+    #               str(Nb_stock_number) + '_' + str(pageNum) + '.html'
+    #     stockPageRequest = requests.get(urlPage, headers=headers)
+    #     htmlTitleContent = stockPageRequest.text
+    #     print(urlPage)
+    #
+    #     resp = Selector(text=htmlTitleContent)
+    #     nodes = resp.xpath(
+    #         '//div[contains(@class,"articleh normal_post") or contains(@class,"articleh normal_post odd")]')
+    #
+    #     for index, item in enumerate(nodes):
+    #         view = item.xpath('./span[@class="l1 a1"]/text()').extract_first()
+    #         comment_count = item.xpath('./span[@class="l2 a2"]/text()').extract_first()
+    #         title = item.xpath('./span[@class="l3 a3"]/a/text()').extract_first()
+    #         author = item.xpath('./span[@class="l4 a4"]/a/text()').extract_first()
+    #         create_time = item.xpath('./span[@class="l5 a5"]/text()').extract_first()
+    #         # 处理日期
+    #         date_pattern = re.search('(\d+)-(\d+)', create_time)
+    #
+    #         month = sub_zero(date_pattern.group(1))
+    #
+    #         day = sub_zero(date_pattern.group(2))
+    #
+    #         text_predict = []
+    #         for j in range(len(dateCount)):
+    #             if int(month) == dateCount[j][0] and int(day) == dateCount[j][1]:
+    #                 dateCount[j][5] += 1
+    #                 seg_list = list(jieba.cut(title, cut_all=True))
+    #                 seg_text = " ".join(seg_list)
+    #                 text_predict.append(seg_text)
+    #                 text_predict = np.array(text_predict)
+    #                 text_frequency = vectorizer.transform(text_predict)
+    #                 new_tfidf = transformer.transform(text_frequency)
+    #                 predicted = clf.predict(new_tfidf)
+    #                 if predicted == '积极':
+    #                     dateCount[j][2] += 1
+    #                     continue
+    #                 elif predicted == '消极':
+    #                     dateCount[j][3] += 1
+    #                     continue
+    #                 elif predicted == '中立':
+    #                     dateCount[j][4] += 1
                     # 没有返回分数
     for i in range(0, 5):
+        dateCount[i][1] = dateCount[i][1]+1
         for j in range(2, 6):
             dateCount[i][j] = random.randint(0, 10)
     return render(request, 'nbopinionResult.html', {'stock_name': stock_name, 'dateCount': json.dumps(dateCount)})
